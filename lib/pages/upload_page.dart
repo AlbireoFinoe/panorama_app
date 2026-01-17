@@ -12,6 +12,8 @@ class UploadPage extends StatefulWidget {
 }
 
 class _UploadPageState extends State<UploadPage> {
+  String selectedEngine = "sift"; // default
+
   final ImagePicker picker = ImagePicker();
   List<Uint8List> images = [];
   bool loading = false;
@@ -82,7 +84,11 @@ class _UploadPageState extends State<UploadPage> {
     setState(() => loading = true);
 
     try {
-      final result = await ApiService.stitchImages(images);
+      final result = await ApiService.stitchImages(
+  images,
+  engine: selectedEngine,
+);
+
 
       if (!mounted) return;
 
@@ -109,7 +115,6 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,9 +132,6 @@ class _UploadPageState extends State<UploadPage> {
       body: Column(
         children: [
 
-          // ==========================================================
-          // BAGIAN KETERANGAN / INSTRUKSI (INI JAWABAN REVISI DOSEN)
-          // ==========================================================
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
@@ -175,6 +177,46 @@ class _UploadPageState extends State<UploadPage> {
               ],
             ),
           ),
+
+          Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Row(
+    children: [
+      const Text(
+        "Algoritma Panorama:",
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: DropdownButtonFormField<String>(
+          value: selectedEngine,
+          items: const [
+            DropdownMenuItem(
+              value: "sift",
+              child: Text("SIFT (Feature-Based)"),
+            ),
+            DropdownMenuItem(
+              value: "opencv",
+              child: Text("OpenCV Stitcher"),
+            ),
+          ],
+          onChanged: loading
+              ? null
+              : (value) {
+                  setState(() {
+                    selectedEngine = value!;
+                  });
+                },
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            isDense: true,
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
 
           // ==========================================================
           // BAGIAN TOMBOL AKSI
@@ -289,9 +331,6 @@ class _UploadPageState extends State<UploadPage> {
                   ),
           ),
 
-          // ==========================================================
-          // BOTTOM ACTION
-          // ==========================================================
           Container(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -331,6 +370,37 @@ class _UploadPageState extends State<UploadPage> {
               ],
             ),
           ),
+
+Padding(
+  padding: const EdgeInsets.only(bottom: 12, top: 4),
+  child: Column(
+    children: const [
+      Divider(thickness: 1),
+      SizedBox(height: 6),
+      Text(
+        "Dibuat oleh:",
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.black54,
+        ),
+      ),
+      SizedBox(height: 4),
+      Text(
+        "Albireo Musyaffa Finoe\n"
+        "Burhanuddin Dhika\n"
+        "Malfino Wildan Akhya",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.black54,
+          height: 1.4,
+        ),
+      ),
+    ],
+  ),
+),
+
         ],
       ),
     );
